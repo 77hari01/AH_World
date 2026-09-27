@@ -1,5 +1,4 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
 import { Suspense, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import Photo from "./Photo.jsx";
@@ -26,9 +25,8 @@ function Scene({ photos, onSelectPhoto, onReady }) {
   const target = useRef({ pitch: 0, yaw: 0 });
   const current = useRef({ pitch: 0, yaw: 0 });
   const velocity = useRef({ pitch: 0, yaw: 0 });
-  const drag = useRef({ active: false, x: 0, y: 0, moved: false });
-  const lastInteraction = useRef(0);
-  const { gl } = useThree();
+  const drag = useRef({ active: false, x: 0, y: 0 });
+  const { gl, invalidate } = useThree();
   const layouts = useMemo(
     () => photos.map((_, index) => generatePhotoLayout(index, photos.length)),
     [photos],
@@ -37,9 +35,9 @@ function Scene({ photos, onSelectPhoto, onReady }) {
   useEffect(() => {
     const element = gl.domElement;
     const handlePointerDown = (event) => {
-      drag.current = { active: true, x: event.clientX, y: event.clientY, moved: false };
-      lastInteraction.current = performance.now();
+      drag.current = { active: true, x: event.clientX, y: event.clientY };
       element.setPointerCapture?.(event.pointerId);
+      invalidate();
     };
     const handlePointerDrag = (event) => {
       if (!drag.current.active) return;
@@ -47,16 +45,16 @@ function Scene({ photos, onSelectPhoto, onReady }) {
       const dy = event.clientY - drag.current.y;
       drag.current.x = event.clientX;
       drag.current.y = event.clientY;
-      if (Math.abs(dx) + Math.abs(dy) > 2) drag.current.moved = true;
       velocity.current.yaw = dx * 0.0036;
       velocity.current.pitch = dy * 0.0026;
       target.current.yaw += dx * 0.0036;
       target.current.pitch = THREE.MathUtils.clamp(target.current.pitch + dy * 0.0026, -1.28, 1.28);
-      lastInteraction.current = performance.now();
+      invalidate();
     };
     const handlePointerUp = (event) => {
       drag.current.active = false;
       element.releasePointerCapture?.(event.pointerId);
+      invalidate();
     };
 
     element.addEventListener("pointerdown", handlePointerDown);
@@ -69,16 +67,15 @@ function Scene({ photos, onSelectPhoto, onReady }) {
       element.removeEventListener("pointerup", handlePointerUp);
       element.removeEventListener("pointercancel", handlePointerUp);
     };
-  }, [gl]);
+  }, [gl, invalidate]);
 
   useEffect(() => {
     const readyTimer = window.setTimeout(onReady, 900);
     return () => window.clearTimeout(readyTimer);
   }, [onReady]);
 
-  useFrame((state, delta) => {
-    const isIdle = performance.now() - lastInteraction.current > 850 && !drag.current.active;
-    if (isIdle) target.current.yaw += delta * 0.018;
+  useFrame((_, delta) => {
+    if (!drag.current.active) target.current.yaw += delta * 0.035;
     target.current.yaw += velocity.current.yaw;
     target.current.pitch = THREE.MathUtils.clamp(target.current.pitch + velocity.current.pitch, -1.28, 1.28);
     velocity.current.yaw *= Math.pow(0.91, delta * 60);
@@ -89,6 +86,16 @@ function Scene({ photos, onSelectPhoto, onReady }) {
     if (groupRef.current) {
       groupRef.current.rotation.x = current.current.pitch;
       groupRef.current.rotation.y = current.current.yaw;
+    }
+
+    if (
+      !drag.current.active
+      || Math.abs(velocity.current.yaw) > 0.001
+      || Math.abs(velocity.current.pitch) > 0.001
+      || Math.abs(current.current.pitch - target.current.pitch) > 0.001
+      || Math.abs(current.current.yaw - target.current.yaw) > 0.001
+    ) {
+      invalidate();
     }
   });
 
@@ -106,12 +113,10 @@ function Scene({ photos, onSelectPhoto, onReady }) {
             key={photo.id}
             photo={photo}
             layout={layouts[index]}
-            index={index}
             onSelect={onSelectPhoto}
           />
         ))}
       </group>
-      <Environment preset="night" />
     </>
   );
 }
@@ -132,8 +137,9 @@ export default function PhotoSpace({ photos, onSelectPhoto, onReady }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 0], fov: 74, near: 0.1, far: 80 }}
-      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-      dpr={[1, 1.8]}
+      gl={{ antialias: false, alpha: false, powerPreference: "low-power" }}
+      dpr={[1, 1.25]}
+      frameloop="demand"
       onCreated={({ gl }) => {
         gl.setClearColor("#101827", 1);
       }}

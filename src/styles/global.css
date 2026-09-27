@@ -274,7 +274,7 @@ body {
 }
 
 .viewer-frame {
-  max-width: min(90vw, 72rem);
+  max-width: min(94vw, 88rem);
   max-height: 88vh;
   margin: 0;
   text-align: center;
@@ -283,7 +283,7 @@ body {
 .viewer-frame img {
   display: block;
   max-width: 100%;
-  max-height: 78vh;
+  max-height: 82vh;
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 0.75rem;
   box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.6);
