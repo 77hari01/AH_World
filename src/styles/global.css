@@ -321,16 +321,22 @@ body {
     top: 1.1rem;
     left: 1.1rem;
     right: 1.1rem;
+    font-size: 0.55rem;
   }
 
   .experience-footer {
     right: 1.1rem;
     bottom: 1.1rem;
     left: 1.1rem;
+    font-size: 0.55rem;
   }
 
   .center-copy {
     width: 88vw;
+  }
+
+  .center-copy h1 {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
   }
 
   .center-kicker,
@@ -341,5 +347,62 @@ body {
 
   .gallery-status {
     display: none;
+  }
+
+  .viewer-frame {
+    max-width: min(95vw, 50rem);
+    max-height: 85vh;
+  }
+
+  .viewer-frame img {
+    max-height: 80vh;
+  }
+
+  .empty-message {
+    width: min(95vw, 32rem);
+    font-size: clamp(0.75rem, 2vw, 0.9rem);
+    padding: 0.7rem 0.9rem;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 1024px) {
+  .experience-header {
+    top: 1.5rem;
+    left: 1.5rem;
+    right: 1.5rem;
+    font-size: 0.6rem;
+  }
+
+  .experience-footer {
+    right: 1.5rem;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    font-size: 0.6rem;
+  }
+
+  .center-copy {
+    width: min(50rem, 85vw);
+  }
+
+  .center-copy h1 {
+    font-size: clamp(3rem, 8vw, 6rem);
+  }
+
+  .viewer-frame {
+    max-width: min(92vw, 70rem);
+  }
+}
+
+@media (min-width: 1025px) {
+  .experience-header {
+    font-size: 0.62rem;
+  }
+
+  .experience-footer {
+    font-size: 0.62rem;
+  }
+
+  .viewer-frame {
+    max-width: min(90vw, 88rem);
   }
 }

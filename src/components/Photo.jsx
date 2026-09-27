@@ -3,7 +3,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 
-export default function Photo({ photo, layout, onSelect }) {
+export default function Photo({ photo, layout, onSelect, isMobile }) {
   const texture = useTexture(photo.textureSrc ?? photo.src);
   const meshRef = useRef();
   const [hovered, setHovered] = useState(false);
@@ -21,9 +21,9 @@ export default function Photo({ photo, layout, onSelect }) {
       ? texture.image.width / texture.image.height
       : 6 / 5;
     const safeAspect = THREE.MathUtils.clamp(aspect, 0.82, 1.42);
-    const baseHeight = 3.05 * layout.scale;
+    const baseHeight = isMobile ? 2.5 * layout.scale : 3.05 * layout.scale;
     return [baseHeight * safeAspect, baseHeight];
-  }, [texture, layout.scale]);
+  }, [texture, layout.scale, isMobile]);
 
   useFrame((_, delta) => {
     if (!meshRef.current) return;
