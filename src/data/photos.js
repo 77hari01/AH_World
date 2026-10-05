@@ -4,7 +4,7 @@ const imageModules = import.meta.glob("../assets/photos/*.{png,jpg,jpeg,PNG,JPG,
   import: "default",
 });
 
-const previewModules = import.meta.glob("../assets/photo-previews/*.webp", {
+const previewModules = import.meta.glob("../assets/photos/*.webp", {
   eager: true,
   query: "?url",
   import: "default",
