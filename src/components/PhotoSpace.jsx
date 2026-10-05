@@ -115,13 +115,14 @@ function Scene({ photos, onSelectPhoto, onReady, isMobile }) {
       <Particles />
       <group ref={groupRef}>
         {photos.map((photo, index) => (
-          <Photo
-            key={photo.id}
-            photo={photo}
-            layout={layouts[index]}
-            isMobile={isMobile}
-            onSelect={onSelectPhoto}
-          />
+          <Suspense key={photo.id} fallback={null}>
+            <Photo
+              photo={photo}
+              layout={layouts[index]}
+              isMobile={isMobile}
+              onSelect={onSelectPhoto}
+            />
+          </Suspense>
         ))}
       </group>
     </>
